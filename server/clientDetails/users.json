@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "username": "user",
+      "email": "user@local.com",
+      "password": "admin"
+    },
+    {
+      "username": "vaishnavi_gowrishankar",
+      "email": "vg2003@gmail.com",
+      "password": "rediff23"
+    }
+  ]
+}

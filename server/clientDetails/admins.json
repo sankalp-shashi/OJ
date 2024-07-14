@@ -1,0 +1,14 @@
+{
+  "admins": [
+    {
+      "username": "administrator",
+      "email": "123@example.com",
+      "password": "secret"
+    },
+    {
+      "username": "vaishnavi",
+      "email": "vg2004@gmail.com",
+      "password": "rediff23"
+    }
+  ]
+}

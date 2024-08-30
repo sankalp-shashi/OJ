@@ -1,55 +1,27 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import LoginWithUsernameBox from './LoginWithUsernameBox';
+import UsernameLoginBox from './UsernameLoginBox';
+import { handleError } from '../eventHandlers/errorHandler';
+import EmailLoginBox from './EmailLoginBox.jsx';
+import RegisterBox from './RegisterBox.jsx';
 
 const BACKEND_API_URL = 'http://localhost:5000';
 
 const LoginBox = () => {
   let navigate = useNavigate();
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const passwordRef = useRef(null); // Create a ref for the password input
-    const [showUsernameLoginBox, setShowUsernameLoginBox] = useState(false);
-    const [showEmailLoginBox, setShowEmailLoginBox] = useState(false);
-    const [showRegisterBox, setShowRegisterBox] = useState(false);
+  
+  const passwordRef = useRef(null); // Create a ref for the password input
+  const emailRef = useRef(null); // Create a ref for the email input
+  
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [showUsernameLoginBox, setShowUsernameLoginBox] = useState(false);
+  const [showEmailLoginBox, setShowEmailLoginBox] = useState(false);
+  const [showRegisterBox, setShowRegisterBox] = useState(false);
 
-  const onLoginClick = async () => {
-    try {
-      const response = await axios.post(BACKEND_API_URL+'/auth/login', {
-        username,
-        email,
-        password,
-      });
-      console.log(response.data);
-      
-      
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Error logging in:', error);
-      handleError(error);
-    }
-  };
-  
-  const handleRegisterButtonClick = async (isAdmin) => {
-    try {
-      const response = await axios.post(BACKEND_API_URL+'/auth/register', {
-        username,
-        email,
-        password,
-        isAdmin,
-      });
-      console.log(response.data);
-      navigate('/dashboard');
-    }
-    catch(error) {
-      console.error('Error registering:', error);
-      handleError(error);
-    }
-  };
-  
   const onUsernameLoginClick = () => {
     setShowEmailLoginBox(false);
     setShowRegisterBox(false);
@@ -67,49 +39,41 @@ const LoginBox = () => {
     setShowEmailLoginBox(false);
     setShowRegisterBox(true);
   };
-  
-  // Handlers for keyboard events
-  const handleUsernameKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      passwordRef.current.focus(); // Move focus to the password input using ref
+
+  const onLoginClick = async () => {
+    try {
+      const response = await axios.post(BACKEND_API_URL+'/auth/login', {
+        username,
+        email,
+        password,
+      });
+      console.log(response.data);
+      
+      
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error logging in:', error);
+      handleError({error, setError});
     }
   };
   
-  const handlePasswordKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      onLoginClick(); // Trigger login on Enter key press
+  const onRegisterButtonClick = async (isAdmin) => {
+    try {
+      const response = await axios.post(BACKEND_API_URL+'/auth/register', {
+        username,
+        email,
+        password,
+        isAdmin,
+      });
+      console.log(response.data);
+      navigate('/dashboard');
+    }
+    catch(error) {
+      console.error('Error registering:', error);
+      handleError({error, setError});
     }
   };
-
-  const handleError = (error) => {
-    switch(error.response.status) {
-      case 400:
-        setError('This username or email is linked to another account.');
-        break;
-      case 401:
-        setError('User was not found.');
-        break;
-      case 402:
-        setError('Token not found. Ensure cookies are not blocked by your browser.');
-        break;
-      case 404:
-        setError('The requested resource was not found.');
-        break;
-      case 405:
-        setError('All fields are required.');
-        break;
-      case 406:
-        setError('Invalid login details');
-        break;
-      case 500:
-        setError('Server error. Please try again later.');
-        break;
-      default:
-        setError('An unexpected error occurred. Please try again later.');
-  }
-}
-
-
+  
   return (
     <div className="bg-black rounded-lg w-[700px] h-[400px] p-5">
       <button className = "bg-black text-gray-500 hover:underline focus:underline p-7 mr-12 focus:text-white" onClick = {onUsernameLoginClick}> 
@@ -123,110 +87,40 @@ const LoginBox = () => {
       </button>
 
      {
-    //    showUsernameLoginBox && <LoginWithUsernameBox username={username} password={password}/>
-      showUsernameLoginBox && <div id = "usernameLoginBox" className = "p-19 justify-center items-center flex flex-col space-y-4">
-      <input
-        type="text"
-        className="bg-gray-800 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={handleUsernameKeyDown} // Handle Enter key for username input
-      />
-      <input
-        ref={passwordRef} // Attach ref to the password input
-        type="password"
-        className="bg-gray-800 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={handlePasswordKeyDown} // Handle Enter key for password input
-      />
-      <button
-        className="bg-indigo-600 text-white rounded-md px-4 py-2 mt-4 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        onClick={onLoginClick}
-      >
-        Login
-      </button>
-      {error && <div className="text-red-500 mt-4">{error}</div>}
-    </div>
+      showUsernameLoginBox && <UsernameLoginBox 
+      username={username}
+      password={password}
+      error={error}
+      passwordRef={passwordRef}
+      setUsername={setUsername}
+      setPassword={setPassword}
+      onLoginClick={onLoginClick}/>
     }
 
-
     {
-      showEmailLoginBox && <div id = "EmailLoginBox" className = "p-19 justify-center items-center flex flex-col space-y-4">
-      <input
-        type="email"
-        className="bg-gray-800 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        onKeyDown={handleUsernameKeyDown} // Handle Enter key for email input
-      />
-      <input
-        ref={passwordRef} // Attach ref to the password input
-        type="password"
-        className="bg-gray-800 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={handlePasswordKeyDown} // Handle Enter key for password input
-      />
-      <button
-        className="bg-indigo-600 text-white rounded-md px-4 py-2 mt-4 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        onClick={onLoginClick}
-      >
-        Login
-      </button>
-      {error && <div className="text-red-500 mt-4">{error}</div>}
-      </div>
+      showEmailLoginBox && <EmailLoginBox
+      email={email}
+      password={password}
+      error={error}
+      passwordRef = {passwordRef}
+      setEmail={setEmail}
+      setPassword={setPassword}
+      onLoginClick={onLoginClick}/>
     }
 
-
     {
-      showRegisterBox && <div id = "RegisterBox" className = "p-19 justify-center items-center flex flex-col space-y-4">
-      <input
-        type="text"
-        className="bg-gray-800 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        onKeyDown={handleUsernameKeyDown} // Handle Enter key for username input
-      />
-      <input
-        type="email"
-        className="bg-gray-800 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        onKeyDown={handleUsernameKeyDown} // Handle Enter key for email input
-      />
-      <input
-        ref={passwordRef} // Attach ref to the password input
-        type="password"
-        className="bg-gray-800 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={handlePasswordKeyDown} // Handle Enter key for password input
-      />
-      <div>
-        <button
-          className="mx-5 bg-indigo-600 text-white rounded-md px-4 py-2 mt-4 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          onClick={() => handleRegisterButtonClick(false)}
-        >
-          Sign Up as a User
-        </button>
-        <button
-          className="ml-5 bg-indigo-600 text-white rounded-md px-4 py-2 mt-4 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          onClick={() => handleRegisterButtonClick(true)}
-        >
-          Sign Up as an Admin
-        </button>
-      </div>
-      {error && <div className="text-red-500 mt-4">{error}</div>}
-    </div>
-  }
+      showRegisterBox && <RegisterBox
+      username={username}
+      email={email}
+      password={password}
+      error={error}
+      passwordRef={passwordRef}
+      emailRef={emailRef}
+      setUsername={setUsername}
+      setEmail={setEmail}
+      setPassword={setPassword}
+      onRegisterButtonClick={onRegisterButtonClick}/>
+    }
     </div>
   );
 };

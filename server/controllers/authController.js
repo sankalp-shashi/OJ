@@ -11,7 +11,6 @@ export const register = async (req, res) => {
 
         // Check if the fields are empty
         if (!username || !email || !password) {
-            console.log(req.body);
             return res.status(405).json({message: 'All fields are required!'});
         }
 
@@ -70,7 +69,7 @@ export const login = async (req, res) => {
 
         const matched = await bcrypt.compare(password, existingUser.password);
         if (!matched) {
-            return res.status(401).json({message: 'Incorrect username or password'});
+            return res.status(406).json({message: 'Incorrect username or password'});
         }
 
         const token = jwt.sign(

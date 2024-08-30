@@ -1,0 +1,6 @@
+400 - user already exists
+401 - user not found
+402 - token not found in cookie
+403 - invalid token found
+405 - blank fields
+406 - unauthorized user

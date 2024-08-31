@@ -1,0 +1,12 @@
+node_nodules/
+
+.env
+
+.vite
+
+build/
+
+.DS_Store/
+
+.vscode/
+.idea/
